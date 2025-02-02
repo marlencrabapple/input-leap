@@ -18,7 +18,8 @@ B_CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=${B_BUILD_TYPE} ${B_CMAKE_FLAGS:-}"
 if [ "$(uname)" = "Darwin" ]; then
     # macOS needs a little help, so we source this environment script to fix paths.
     [ -e ./macos_environment.sh ] && . ./macos_environment.sh
-    B_CMAKE_FLAGS="${B_CMAKE_FLAGS} -DCMAKE_OSX_SYSROOT=$(xcrun --sdk macosx --show-sdk-path) -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9"
+    B_CMAKE_FLAGS="-DCMAKE_OSX_SYSROOT=$(xcrun --sdk macosx --show-sdk-path) -DCMAKE_OSX_DEPLOYMENT_TARGET=14.7 $B_CMAKE_FLAGS"
+    post_build="dist/macos/post_build.sh"
 fi
 
 # Prefer ninja if available
@@ -40,4 +41,6 @@ cd ${B_BUILD_DIR}
 echo "Starting Input Leap $B_BUILD_TYPE build in '${B_BUILD_DIR}'..."
 "$B_CMAKE" $B_CMAKE_FLAGS ..
 "$B_CMAKE" --build . --parallel
+
+[ -e "$post_build" ] && . "$post_build"
 echo "Build completed successfully"
